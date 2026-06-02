@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر الأجهزة الرقمية والذكية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- الألوان والمتغيرات الأساسية --- */
+        :root {
+            --primary-color: #00f2fe;
+            --secondary-color: #4facfe;
+            --dark-bg: #0a0f1d;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-color: #ffffff;
+            --text-muted: #a0aec0;
+            --accent-glow: 0 0 15px rgba(0, 242, 254, 0.5);
+            --success-color: #2ecc71;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- Background Animation --- */
+        .animated-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: radial-gradient(circle at 50% 50%, #141e30, #243b55);
+            z-index: -2;
+        }
+
+        .bg-particles {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background-image:
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px);
+            background-size: 550px 550px, 350px 350px;
+            background-position: 0 0, 40px 60px;
+            animation: bgMove 60s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes bgMove {
+            from { background-position: 0 0, 40px 60px; }
+            to { background-position: 550px 550px, 390px 610px; }
+        }
+
+        /* --- Header --- */
+        header {
+            background: rgba(10, 15, 29, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-section i {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            text-shadow: var(--accent-glow);
+        }
+
+        .logo-section h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .datetime-widget {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            color: var(--primary-color);
+            animation: pulseGlow 2s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 5px rgba(0, 242, 254, 0.1); }
+            to { box-shadow: 0 0 12px rgba(0, 242, 254, 0.3); }
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--primary-color); }
+
+        .whatsapp-header-btn {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .whatsapp-header-btn:hover {
+            background: #1ebe5a;
+            transform: scale(1.05);
+        }
+
+        /* --- Ticker --- */
+        .ticker-wrapper {
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            color: #0a0f1d;
+            overflow: hidden;
+            padding: 8px 0;
+            font-weight: bold;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);
+        }
+
+        .ticker-text {
+            display: inline-block;
+            white-space: nowrap;
+            animation: ticker-rtl 30s linear infinite;
+        }
+
+        @keyframes ticker-rtl {
+            0%   { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* --- Hero --- */
+        .hero-section {
+            text-align: center;
+            padding: 50px 20px 30px;
+        }
+
+        .hero-badge-1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        }
+
+        .hero-badge-2 {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            display: inline-block;
+            padding: 8px 25px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* --- Controls --- */
+        .controls-container {
+            max-width: 1200px;
+            margin: 40px auto 20px;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 45px 12px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .search-box input:focus { border-color: var(--primary-color); }
+
+        .search-box i {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: var(--dark-bg);
+            font-weight: bold;
+            border-color: transparent;
+            box-shadow: var(--accent-glow);
+        }
+
+        /* --- Products Grid --- */
+        .products-grid {
+            max-width: 1200px;
+            margin: 30px auto 60px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 25px;
+            padding: 0 20px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            backdrop-filter: blur(5px);
+            transition: transform 0.3s, border-color 0.3s;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+        }
+
+        .product-gallery {
+            position: relative;
+            width: 100%;
+            height: 180px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(0,0,0,0.2);
+            user-select: none;
+        }
+
+        .gallery-track {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .gallery-slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 10px;
+        }
+
+        .gallery-slide img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            pointer-events: none;
+            padding: 5px;
+        }
+
+        .gallery-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(10, 15, 29, 0.7);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: 0.3s;
+            opacity: 0;
+            z-index: 5;
+        }
+
+        .product-card:hover .gallery-nav-btn,
+        .gallery-nav-btn:active { opacity: 1; }
+
+        .gallery-nav-btn:hover {
+            background: var(--primary-color);
+            color: var(--dark-bg);
+            box-shadow: var(--accent-glow);
+        }
+
+        .nav-prev { left: 10px; }
+        .nav-next { right: 10px; }
+
+        .gallery-dots {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 5px;
+            z-index: 5;
+        }
+
+        .gallery-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .gallery-dot.active {
+            background: var(--primary-color);
+            box-shadow: var(--accent-glow);
+            width: 12px;
+            border-radius: 3px;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        .status-new { background: #27ae60; color: white; }
+        .status-like-new { background: #e67e22; color: white; }
+        .status-good { background: #2980b9; color: white; }
+
+        .promo-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ff4d4d;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        .product-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin: 5px 0 10px;
+        }
+
+        .product-category {
+            font-size: 0.8rem;
+            color: var(--primary-color);
+        }
+
+        .tech-specs {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        .price-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .current-price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--success-color);
+        }
+
+        .old-price {
+            font-size: 1rem;
+            color: #e74c3c;
+            text-decoration: line-through;
+        }
+
+        .card-actions { display: flex; gap: 10px; }
+
+        .order-now-btn {
+            flex: 1;
+            padding: 10px;
+            background: linear-gradient(45deg, #00f2fe, #4facfe);
+            color: var(--dark-bg);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            transition: 0.3s;
+        }
+
+        .order-now-btn:hover {
+            transform: scale(1.03);
+            box-shadow: var(--accent-glow);
+        }
+
+        /* --- Modal --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(10, 15, 29, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background: #141e30;
+            border: 1px solid var(--primary-color);
+            box-shadow: var(--accent-glow);
+            width: 90%;
+            max-width: 450px;
+            padding: 25px;
+            border-radius: 15px;
+            position: relative;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .modal-box { transform: translateY(0); }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+        }
+
+        .close-modal-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        .form-group { margin-bottom: 15px; }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: white;
+            outline: none;
+            font-size: 0.95rem;
+            transition: 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary-color);
+        }
+
+        .form-group select option { background: #141e30; color: white; }
+
+        .submit-order-btn {
+            width: 100%;
+            padding: 12px;
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+            margin-top: 20px;
+        }
+
+        .submit-order-btn:hover {
+            background: #1ebe5a;
+            box-shadow: 0 0 15px rgba(37, 211, 102, 0.4);
+        }
+
+        /* --- Footer --- */
+        footer {
+            background: rgba(5, 8, 16, 0.95);
+            border-top: 1px solid rgba(0, 242, 254, 0.1);
+            padding: 40px 20px 20px;
+            text-align: center;
+        }
+
+        .footer-info {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .info-item i { color: var(--primary-color); margin-left: 8px; }
+        .copyrights { font-size: 0.9rem; color: var(--text-muted); border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 20px; }
+        .developer-tag { color: var(--secondary-color); font-weight: bold; text-decoration: none; }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 12px; }
+            .nav-links { display: none; }
+            .footer-info { flex-direction: column; gap: 15px; }
+            .hero-badge-1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="animated-bg"></div>
+    <div class="bg-particles"></div>
+
+    <header>
+        <div class="logo-section">
+            <i class="fa-solid fa-laptop-code"></i>
+            <h1 id="headerStoreName">اسم المحل</h1>
+        </div>
+
+        <div class="datetime-widget" id="datetimeWidget">
+            <i class="fa-regular fa-clock"></i>
+            <span id="liveTime">00:00:00</span>
+            <span>|</span>
+            <span id="liveDate">--/--/----</span>
+        </div>
+
+        <div class="nav-actions">
+            <nav class="nav-links">
+                <a href="#products">المنتجات</a>
+                <a href="#contact">تواصل معنا</a>
+            </nav>
+            <a id="headerWhatsappBtn" href="#" target="_blank" class="whatsapp-header-btn">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>تواصل معنا</span>
+            </a>
+        </div>
+    </header>
+
+    <div class="ticker-wrapper">
+         <div class="ticker-text" id="tickerText">جاري تحميل الإعلانات والعروض...</div>
+    </div>
+
+    <section class="hero-section">
+        <h2 class="hero-badge-1">جودة عالية بأسعار مغرية واستثنائية</h2>
+        <p class="hero-badge-2">إرضاؤكم هو غايتنا</p>
+    </section>
+
+    <div class="controls-container" id="products">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="ابحث عن منتج...">
+        </div>
+
+        <div class="filter-tabs">
+            <button class="filter-btn active" data-category="all">الكل</button>
+            <button class="filter-btn" data-category="هواتف">هواتف ذكية</button>
+            <button class="filter-btn" data-category="تابلت">تابلت و ايباد</button>
+            <button class="filter-btn" data-category="ساعات">ساعات ذكية</button>
+            <button class="filter-btn" data-category="سماعات">سماعات بلوتوث</button>
+            <button class="filter-btn" data-category="شواحن">شواحن واكسسوارات</button>
+        </div>
+    </div>
+
+    <main class="products-grid" id="productsGrid"></main>
+
+    <div class="modal-overlay" id="orderModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modalProductTitle">طلب منتج</h3>
+                <button class="close-modal-btn" onclick="closeOrderModal()">&times;</button>
+            </div>
+            <form id="orderForm" onsubmit="sendToWhatsApp(event)">
+                <div class="form-group">
+                    <label>الاسم</label>
+                    <input type="text" id="custFirstName" required placeholder="أدخل اسمك الشخصي">
+                </div>
+                <div class="form-group">
+                    <label>اللقب</label>
+                    <input type="text" id="custLastName" required placeholder="أدخل لقبك">
+                </div>
+                <div class="form-group">
+                    <label>رقم الهاتف</label>
+                    <input type="tel" id="custPhone" required placeholder="05XXXXXXXX" pattern="[0-9]{10}">
+                </div>
+                <div class="form-group">
+                    <label>الولاية</label>
+                    <select id="custWilaya" required onchange="handleWilayaChange()">
+                        <option value="">اختر الولاية...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>البلدية</label>
+                    <select id="custCommune" required disabled>
+                        <option value="">اختر البلدية...</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="submit-order-btn">
+                    <i class="fa-brands fa-whatsapp"></i> تأكيد الطلب عبر الواتساب
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <footer id="contact">
+        <div class="footer-info">
+            <div class="info-item"><i class="fa-solid fa-phone"></i><span id="footerPhone">0555-XX-XX-XX</span></div>
+            <div class="info-item"><i class="fa-solid fa-location-dot"></i><span>العنوان: الجزائر</span></div>
+        </div>
+        <div class="copyrights">
+            <p>جميع الحقوق محفوظة لدى <span id="footerStoreName">اسم المحل</span> - 2026</p>
+            <p style="margin-top: 5px; font-size: 0.8rem;">أُنشئ بواسطة <a href="#" class="developer-tag">Rouina Mohamed Amine</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // ============================================================
+        // 🔐 إعدادات ومفاتيح الربط بـ Supabase
+        // ============================================================
+        
+        const SB_URL = 'https://eviaairjtuhyrwdjyfpg.supabase.co'; 
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2aWFhaXJqdHVoeXJ3ZGp5ZnBnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzIxMDUsImV4cCI6MjA5NTkwODEwNX0.z74yrzlurwht4uqOy90Zex48SfGMv1artJPEpFxGaQY'; 
+
+        const _supabase = supabase.createClient(SB_URL, SB_KEY);
+
+        let cloudStorePhone = "213555000000"; 
+
+        // مصفوفة الولايات والبلديات
+        const algeriaProvinces = [
+            { code: "01", name: "01 - أدرار", communes: ["أدرار", "تامست", "شروين", "رقان", "إن زغمير", "تيت", "أولف", "تيمقطن", "بودا", "فنوغيل", "تمنطيط", "أولاد أحمد تيمي"] },
+            { code: "02", name: "02 - الشلف", communes: ["الشلف", "تنس", "بوقادير", "أولاد فارس", "الشطية", "سيدي عكاشة", "تاوقريت", "بني حواء", "سنجاس", "المرسى", "سيدي عبد الرحمن", "مصدق", "أولاد بن عبد القادر", "عين مران", "بنايرية", "الأبيض مجاجة", "وادي الفضة", "أولاد عباس"] },
+            { code: "03", name: "03 - الأغواط", communes: ["الأغواط", "أفلو", "عين ماضي", "كوردان", "سيدي مخلوف", "الحوايط", "الخنق", "بن ناصر بن شهرة", "حاسي الدلاعة", "حاسي الرمل", "عين سيدي علي", "قلتة سيدي سعد", "البيضاء"] },
+            { code: "04", name: "04 - أم البواقي", communes: ["أم البواقي", "عين فكرون", "عين مليلة", "عين البيضاء", "عين كرشة", "مسكيانة", "سوق نعمان", "قصر الصبيحي", "الضلعة", "فكرينة", "عامرية", "وادي نيني"] },
+            { code: "05", name: "05 - باتنة", communes: ["باتنة", "أريس", "بريكة", "مروانة", "عين التوتة", "تيمقاد", "رأس العيون", "نقاوس", "المعذر", "تازولت", "ثنية العابد", "وادي الماء", "شير", "منعة"] },
+            { code: "06", name: "06 - بجاية", communes: ["بجاية", "أقبو", "أوقاس", "خراطة", "أميزور", "تيمزريت", "صدوق", "تشميني", "القصر", "تيشي", "سوق الاثنين", "درقينة", "توجة", "وادي غير"] },
+            { code: "07", name: "07 - بسكرة", communes: ["بسكرة", "طولقة", "سيدي عقبة", "زريبة الوادي", "مشونش", "لوطاية", "جمورة", "الفيض", "الحوش", "شعين"] },
+            { code: "08", name: "08 - بشار", communes: ["بشار", "القنادسة", "تاغيت", "العبادلة", "لحمر", "موغل", "مريجة", "بني ونيف", "تبلبالة", "عرق فراج"] },
+            { code: "09", name: "09 - البليدة", communes: ["البليدة", "بوفاريك", "العفرون", "أولاد يعيش", "الصومعة", "موزاية", "الأربعاء", "شبانية", "حمام ملوان", "بني مراد", "قرواو"] },
+            { code: "10", name: "10 - البويرة", communes: ["البويرة", "الأخضرية", "سور الغزلان", "عين بسام", "مشدالة", "قاديرية", "بشلول", "حيزر", "برج أوخريص", "هاشمية"] },
+            { code: "11", name: "11 - تمنراست", communes: ["تمنراست", "أبالسة", "إن غار", "فقارة الزوى"] },
+            { code: "12", name: "12 - تبسة", communes: ["تبسة", "بئر العاتر", "الشريعة", "الونزة", "العوينات", "مرسط", "الماء الأبيض", "العقلة", "الكويف", "بكارية", "نقرين"] },
+            { code: "13", name: "13 - تلمسان", communes: ["تلمسان", "مغنية", "منصورة", "شتوان", "الغزوات", "أولاد ميمون", "الحناية", "سبدو", "ندروما", "رمشي", "بني سنوس", "مرسى بن مهيدي"] },
+            { code: "14", name: "14 - تيارت", communes: ["تيارت", "السوقر", "فرندة", "قصر الشلالة", "مهدية", "الدحموني", "عين الذهب", "مدروسة", "تيداس", "تيدة", "الرحوية"] },
+            { code: "15", name: "15 - تيزي وزو", communes: ["تيزي وزو", "عزازقة", "ذراع الميزان", "واضية", "الأربعاء ناث إيراثن", "عين الحمام", "أزفون", "تقزيرت", "بوغني", "ميقيلة", "واسيف"] },
+            { code: "16", name: "16 - الجزائر", communes: ["سيدي امحمد", "الجزائر الوسطى", "المرادية", "المدنية", "باب الوادي", "بولغين", "وادي قريش", "الرايس حميدو", "الحراش", "بوروبة", "وادي السمار", "المحمدية", "بئر مراد رايس", "بئر خادم", "حيدرة", "السحاولة", "حسين داي", "المقرية", "القبة", "محمد بلوزداد", "بن عكنون", "الأبيار", "المرسى", "برج البحري", "برج الكيفان", "باب الزوار", "الدار البيضاء", "عين طاية", "الرويبة", "الرغاية", "هراوة", "بوزريعة", "بن مسوس", "دالي إبراهيم", "الشراقة", "العاشور", "درارية", "الدويرة", "بابا حسن", "خرايسية", "بئر توتة", "براقي", "زرالدة", "سطاوالي", "عين البنيان"] },
+            { code: "17", name: "17 - الجلفة", communes: ["جلفة", "حاسي بحبح", "مسعد", "عين وسارة", "الشارف", "دار الشيوخ", "الإدريسية", "حد الصحاري", "فيض البطمة", "البيرين"] },
+            { code: "18", name: "18 - جيجل", communes: ["جيجل", "الطاهير", "الميلية", "العوانة", "زيامة منصورية", "الشقفة", "الأنصار", "قاوس", "السطارة", "جمعة بني حبيبي"] },
+            { code: "19", name: "19 - سطيف", communes: ["سطيف", "العلمة", "عين أرنات", "عين ولمان", "بوقاعة", "عموشة", "صالح باي", "حمام السخنة", "قجال", "بني عزيز", "جميلة", "عين الكبيرة"] },
+            { code: "20", name: "20 - سعيدة", communes: ["سعيدة", "عين الحجر", "يوب", "الحساسنة", "أولاد خالد", "سيدي بوبكر", "سيدي أحمد", "مولاي العربي"] },
+            { code: "21", name: "21 - سكيكدة", communes: ["سكيكدة", "الحروش", "عزابة", "القل", "تمالوس", "رمضان جمال", "حمادي كرومة", "فلفلة", "سيدي مزغيش", "بين الويدان"] },
+            { code: "22", name: "22 - سيدي بلعباس", communes: ["سيدي بلعباس", "تلاغ", "سفيزف", "ابن باديس", "سيدي لحسن", "تنيرة", "مرحوم", "بلعربي"] },
+            { code: "23", name: "23 - عنابة", communes: ["عنابة", "البوني", "الحجار", "سيدي عمار", "برحال", "شطايبي", "سرايدي", "عين الباردة"] },
+            { code: "24", name: "24 - قالمة", communes: ["قالمة", "وادي الزناتي", "بوشقوف", "هيوب", "حمام دباغ", "لخزارة", "قلعة بوصبع", "تاملوكة", "عين مخلوف"] },
+            { code: "25", name: "25 - قسنطينة", communes: ["قسنطينة", "الخروب", "حامة بوزيان", "ديدوش مراد", "زيغود يوسف", "ابن زياد"] },
+            { code: "26", name: "26 - المدية", communes: ["المدية", "البرواقية", "قصر البخاري", "بني سليمان", "تابلاط", "عوامري", "العزيزية", "شلالة العذاورة", "سيدي نعمان"] },
+            { code: "27", name: "27 - مستغانم", communes: ["مستغانم", "عين تادلس", "سيدي علي", "ماسرة", "بوقيرات", "حاسي ماماش", "عشاوشة", "خير الدين"] },
+            { code: "28", name: "28 - المسيلة", communes: ["المسيلة", "بوسعادة", "سيدي عيسى", "مقرة", "أولاد دراج", "خوبانة", "حمام الضلعة", "عين الحجل"] },
+            { code: "29", name: "29 - معسكر", communes: ["معسكر", "سيق", "المحمدية", "تيغنيف", "غريس", "بوحنيفية", "وادي الأبطال"] },
+            { code: "30", name: "30 - ورقلة", communes: ["ورقلة", "حاسي مسعود", "الرويسات", "عين البيضاء", "نقرين", "البرمة"] },
+            { code: "31", name: "31 - وهران", communes: ["وهران", "بير الجير", "السانية", "أرزيو", "بطيوة", "قديل", "عين الترك", "وادي تليلات", "حاسي بونيف", "مسيرغين"] },
+            { code: "32", name: "32 - البيض", communes: ["البيض", "الأبيض سيدي الشيخ", "شلالة", "بريزينة", "الغاسول", "الكاف الأحمر", "الرقاصة"] },
+            { code: "33", name: "33 - إليزي", communes: ["إليزي", "برج عمر إدريس", "برج الحواس"] },
+            { code: "34", name: "34 - برج بوعريريج", communes: ["برج بوعريريج", "رأس الوادي", "برج غدير", "المنصورة", "مجانة", "الحمادية", "خليل", "الياشير"] },
+            { code: "35", name: "35 - بومرداس", communes: ["بومرداس", "بودواو", "برج منايل", "دلس", "الثنية", "خميس الخشنة", "يسر", "الناصرية", "أولاد هداج"] },
+            { code: "36", name: "36 - الطارف", communes: ["الطارف", "القالة", "الذرعان", "بوثلجة", "بن مهيدي", "بوحجار", "الشط", "العصفور"] },
+            { code: "37", name: "37 - تندوف", communes: ["تندوف", "أم العسل"] },
+            { code: "38", name: "38 - تيسمسيلت", communes: ["تيسمسيلت", "ثنية الحد", "برج بونعامة", "خميستي", "لرجام", "عماري"] },
+            { code: "39", name: "39 - الوادي", communes: ["الوادي", "قمار", "الرقيبة", "الرباح", "حاسي خليفة", "البياضة"] },
+            { code: "40", name: "40 - خنشلة", communes: ["خنشلة", "ششار", "قايس", "أولاد رشاش", "المحمل", "بوحمامة", "الحامة", "عين الطويلة"] },
+            { code: "41", name: "41 - سوق أهراس", communes: ["سوق أهراس", "سدراتة", "مداوروش", "تاورة", "المشروحة", "المراهنة", "الحدادة"] },
+            { code: "42", name: "42 - تيبازة", communes: ["تيبازة", "حجوط", "شرشال", "القليعة", "بو إسماعيل", "فوكة", "الداموس", "قوراية", "أحمر العين", "شنوة"] },
+            { code: "43", name: "43 - ميلة", communes: ["ميلة", "شلغوم العيد", "فرادج", "التلاغمة", "تاجنانت", "بوحاتم", "سيدي مروان", "القرارم قوقة"] },
+            { code: "44", name: "44 - عين الدفلى", communes: ["عين الدفلى", "خميس مليانة", "مليانة", "العطاف", "العبادية", "جليدة", "بوراشد", "بومدفع"] },
+            { code: "45", name: "45 - النعامة", communes: ["النعامة", "مشرية", "عين الصفراء", "عسلة", "صفيصيفة", "البيوض"] },
+            { code: "46", name: "46 - عين تموشنت", communes: ["عين تموشنت", "بني صاف", "حمام بوحجر", "العامرية", "المالح", "ولهاصة", "عين الأربعاء"] },
+            { code: "47", name: "47 - غرداية", communes: ["غرداية", "متليلي", "القرارة", "بني يزقن", "العطف", "بونورة"] },
+            { code: "48", name: "48 - غليزان", communes: ["غليزان", "وادي ارهيو", "عمي موسى", "مازونة", "المطمر", "يلل", "منداس", "سيدي امحمد بن علي"] },
+            { code: "49", name: "49 - تيميمون", communes: ["تيميمون", "أوقروت", "شروين", "طلمين", "قصر قدور"] },
+            { code: "50", name: "50 - برج باجي مختار", communes: ["برج باجي مختار", "تيمياوين"] },
+            { code: "51", name: "51 - أولاد جلال", communes: ["أولاد جلال", "الدوسن", "سيدي خالد", "البسباس", "الشعيبة"] },
+            { code: "52", name: "52 - بني عباس", communes: ["بني عباس", "كرزاز", "الواتة", "القصابي", "تبلبالة", "إقلي"] },
+            { code: "53", name: "53 - إن صالح", communes: ["إن صالح", "إن غار"] },
+            { code: "54", name: "54 - إن قزام", communes: ["إن قزام", "تين زواتين"] },
+            { code: "55", name: "55 - تقرت", communes: ["تقرت", "تماسين", "الماي", "المدين", "النزلة", "الطيبات"] },
+            { code: "56", name: "56 - جانت", communes: ["جانت"] },
+            { code: "57", name: "57 - المغير", communes: ["المغير", "جامعة", "أم الطيور", "سيدي عمران"] },
+            { code: "58", name: "58 - المنيعة", communes: ["المنيعة", "حاسي الفحل", "حاسي القارة"] }
+        ];
+
+        // تحديث الوقت والتاريخ
+        function updateDateTime() {
+            const now = new Date();
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            document.getElementById('liveTime').innerText = now.toLocaleTimeString('ar-DZ', timeOptions);
+            const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            document.getElementById('liveDate').innerText = now.toLocaleDateString('ar-DZ', dateOptions);
+        }
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+
+        function initWilayas() {
+            const selectWilaya = document.getElementById('custWilaya');
+            algeriaProvinces.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.name;
+                opt.innerText = p.name;
+                selectWilaya.appendChild(opt);
+            });
+        }
+
+        function handleWilayaChange() {
+            const selectWilaya = document.getElementById('custWilaya');
+            const selectCommune = document.getElementById('custCommune');
+            selectCommune.innerHTML = '<option value="">اختر البلدية...</option>';
+            if (selectWilaya.value === "") { selectCommune.disabled = true; return; }
+            const foundProvince = algeriaProvinces.find(p => p.name === selectWilaya.value);
+            if (foundProvince && foundProvince.communes) {
+                foundProvince.communes.forEach(commune => {
+                    const opt = document.createElement('option');
+                    opt.value = commune; opt.innerText = commune;
+                    selectCommune.appendChild(opt);
+                });
+                selectCommune.disabled = false;
+            }
+        }
+
+        // إدارة المنتجات
+        let productsData = [];
+        let selectedProduct = null;
+        let currentSlideIndexes = {};
+
+        function displayProducts(products) {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = "";
+            if (products.length === 0) {
+                grid.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding: 40px;">لا توجد نتائج مطابقة للبحث</p>`;
+                return;
+            }
+
+            products.forEach(product => {
+                let statusClass = product.status === 'new' ? 'status-new' : product.status === 'like-new' ? 'status-like-new' : 'status-good';
+                let statusText = product.status === 'new' ? 'جديد' : product.status === 'like-new' ? 'مستعمل كالجديد' : 'مستعمل حالة جيدة';
+
+                currentSlideIndexes[product.id] = 0;
+
+                const card = document.createElement('div');
+                card.className = 'product-card';
+
+                let slidesHTML = '';
+                let dotsHTML = '';
+                const imagesArray = product.images && product.images.length > 0 ? product.images : ["https://via.placeholder.com/500?text=No+Image"];
+
+                imagesArray.forEach((imgUrl, idx) => {
+                    slidesHTML += `<div class="gallery-slide"><img src="${imgUrl}" alt="${product.name}" loading="lazy"></div>`;
+                    dotsHTML += `<div class="gallery-dot ${idx === 0 ? 'active' : ''}" data-idx="${idx}" onclick="goToSlide(${product.id}, ${idx})"></div>`;
+                });
+
+                card.innerHTML = `
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                    ${product.promo ? `<span class="promo-badge">${product.promo}</span>` : ''}
+
+                    <div class="product-gallery" id="gallery-${product.id}">
+                        ${imagesArray.length > 1 ? `
+                            <button class="gallery-nav-btn nav-prev" onclick="moveSlide(${product.id}, -1)"><i class="fa-solid fa-chevron-right"></i></button>
+                            <button class="gallery-nav-btn nav-next" onclick="moveSlide(${product.id}, 1)"><i class="fa-solid fa-chevron-left"></i></button>
+                        ` : ''}
+                        <div class="gallery-track" id="track-${product.id}">${slidesHTML}</div>
+                        <div class="gallery-dots" id="dots-${product.id}">
+                            ${imagesArray.length > 1 ? dotsHTML : ''}
+                        </div>
+                    </div>
+
+                    <div class="product-category">${product.category}</div>
+                    <div class="product-title">${product.name}</div>
+
+                    <div class="tech-specs">
+                        <div>المعالج: ${product.specs.processor || '-'}</div>
+                        <div>الرام: ${product.specs.ram || '-'}</div>
+                        <div>التخزين: ${product.specs.storage || '-'}</div>
+                        <div>البطارية: ${product.specs.battery || '-'}</div>
+                        <div>الشحن: ${product.specs.Charging || product.specs.chargingSpeed || product.specs.charging || '-'}</div>
+                        <div>الشاشة: ${product.specs.screenType || '-'}</div>
+                        <div>التردد: ${product.specs.screenRefresh || '-'}</div>
+                    </div>
+
+                    <div class="price-container">
+                        <span class="current-price">${product.price.toLocaleString()} دج</span>
+                        ${product.oldPrice ? `<span class="old-price">${product.oldPrice.toLocaleString()} دج</span>` : ''}
+                    </div>
+
+                    <div class="card-actions">
+                        <button class="order-now-btn" onclick='openOrderModal(${JSON.stringify(product).replace(/'/g, "&apos;")})'>
+                            <i class="fa-solid fa-basket-shopping"></i> اطلب الآن
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+                if (imagesArray.length > 1) setupSwipeEvents(product.id);
+            });
+        }
+
+        function moveSlide(productId, direction) {
+            const product = productsData.find(p => p.id === productId);
+            const count = product.images.length;
+            let idx = currentSlideIndexes[productId] + direction;
+            if (idx >= count) idx = 0;
+            if (idx < 0) idx = count - 1;
+            currentSlideIndexes[productId] = idx;
+            updateGalleryUI(productId, idx);
+        }
+
+        function goToSlide(productId, idx) {
+            currentSlideIndexes[productId] = idx;
+            updateGalleryUI(productId, idx);
+        }
+
+        function updateGalleryUI(productId, index) {
+            const track = document.getElementById(`track-${productId}`);
+            if (track) track.style.transform = `translateX(${index * 100}%)`;
+            const dots = document.getElementById(`dots-${productId}`);
+            if (dots) {
+                dots.querySelectorAll('.gallery-dot').forEach((d, i) => d.classList.toggle('active', i === index));
+            }
+        }
+
+        function setupSwipeEvents(productId) {
+            const gallery = document.getElementById(`gallery-${productId}`);
+            let startX = 0;
+            gallery.addEventListener('touchstart', e => startX = e.touches[0].clientX, {passive:true});
+            gallery.addEventListener('touchend', e => {
+                let diff = startX - e.changedTouches[0].clientX;
+                if (Math.abs(diff) > 50) moveSlide(productId, diff > 0 ? 1 : -1);
+            }, {passive:true});
+        }
+
+        function openOrderModal(product) {
+            selectedProduct = product;
+            document.getElementById('modalProductTitle').innerText = `طلب: ${product.name}`;
+            document.getElementById('orderModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeOrderModal() {
+            document.getElementById('orderModal').classList.remove('active');
+            document.getElementById('orderForm').reset();
+            document.getElementById('custCommune').disabled = true;
+            document.body.style.overflow = '';
+        }
+
+        async function sendToWhatsApp(event) {
+            event.preventDefault();
+            const btn = event.target.querySelector('.submit-order-btn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري المعالجة...`;
+
+            const fName = document.getElementById('custFirstName').value.trim();
+            const lName = document.getElementById('custLastName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const wilaya = document.getElementById('custWilaya').value;
+            const commune = document.getElementById('custCommune').value.trim();
+
+            const fullName = `${fName} ${lName}`;
+
+            try {
+                // إدخال مباشر في جدول store_orders المتوافق تماماً مع حقول الـ SQL الخاصة بك
+                const { error } = await _supabase.from('store_orders').insert([{
+                    prodId: selectedProduct.id,
+                    prodName: selectedProduct.name,
+                    customerName: fullName,
+                    customerPhone: phone,
+                    customerWilaya: wilaya,
+                    customerCommune: commune,
+                    totalPrice: selectedProduct.price,
+                    status: 'pending'
+                }]);
+                
+                if (error) throw error;
+
+                const msg = `*طلب شراء جديد* 🛒\n📦 *المنتج:* ${selectedProduct.name}\n💰 *السعر:* ${selectedProduct.price} دج\n👤 *الزبون:* ${fullName}\n📱 *الهاتف:* ${phone}\n📍 *العنوان:* ${wilaya} - ${commune}`;
+                window.open(`https://api.whatsapp.com/send?phone=${cloudStorePhone}&text=${encodeURIComponent(msg)}`, '_blank');
+                closeOrderModal();
+            } catch (err) {
+                console.error("Supabase Error:", err.message);
+                alert("خطأ في الاتصال بالسيرفر، سيتم التحويل للواتساب مباشرة لإتمام الطلب.");
+                const backupMsg = `*طلب شراء منتج:* ${selectedProduct.name}\n👤 *الاسم:* ${fullName}\n📱 *الهاتف:* ${phone}\n📍 *العنوان:* ${wilaya} - ${commune}`;
+                window.open(`https://api.whatsapp.com/send?phone=${cloudStorePhone}&text=${encodeURIComponent(backupMsg)}`, '_blank');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        // جلب الإعدادات من Supabase
+        async function applyStoreSettingsFromSupabase() {
+            try {
+                const { data, error } = await _supabase.from('store_settings').select('*').single();
+                if (error) throw error;
+                if (data) {
+                    cloudStorePhone = data.phone || cloudStorePhone;
+                    document.getElementById('headerStoreName').innerText = data.storeName || "متجر الأجهزة";
+                    document.getElementById('footerStoreName').innerText = data.storeName || "متجر الأجهزة";
+                    document.getElementById('tickerText').innerText = data.tickerText || "أهلاً بكم في متجرنا";
+                    document.getElementById('headerWhatsappBtn').href = `https://api.whatsapp.com/send?phone=${cloudStorePhone}`;
+                    document.getElementById('footerPhone').innerText = cloudStorePhone;
+                }
+            } catch (err) { console.error('Settings Error:', err.message); }
+        }
+
+        // جلب المنتجات من Supabase
+        async function loadProductsFromSupabase() {
+            try {
+                const { data, error } = await _supabase.from('store_products').select('*').order('id', { ascending: false });
+                if (error) throw error;
+                productsData = data.map(p => ({
+                    id: p.id, name: p.name, category: p.category, status: p.status,
+                    price: p.price, oldPrice: p.oldPrice, promo: p.promo, images: p.images || [],
+                    specs: p.specs || {}
+                }));
+                displayProducts(productsData);
+            } catch (err) {
+                console.error('Products Error:', err.message);
+                document.getElementById('productsGrid').innerHTML = "<p>تعذر تحميل المنتجات حالياً.</p>";
+            }
+        }
+
+        // البحث والفلترة
+        document.getElementById('searchInput').addEventListener('input', e => {
+            const term = e.target.value.toLowerCase();
+            const filtered = productsData.filter(p => p.name.toLowerCase().includes(term));
+            displayProducts(filtered);
+        });
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                const cat = e.target.dataset.category;
+                const filtered = cat === 'all' ? productsData : productsData.filter(p => p.category === cat);
+                displayProducts(filtered);
+            });
+        });
+
+        window.onload = () => {
+            initWilayas();
+            applyStoreSettingsFromSupabase();
+            loadProductsFromSupabase();
+        };
+    </script>
+</body>
+</html>
