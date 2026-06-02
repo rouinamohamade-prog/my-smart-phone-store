@@ -28,7 +28,7 @@
             min-height: 100vh;
         }
 
-        /* ===== FIX: شاشة تسجيل الدخول ===== */
+        /* ===== شاشة تسجيل الدخول ===== */
         #loginScreen {
             position: fixed;
             inset: 0;
@@ -127,7 +127,7 @@
             display: none;
         }
 
-        /* ===== لوحة التحكم الرئيسية ===== */
+        /* ===== لوحة التحكم الرئيسية (شاشات الكمبيوتر والحاسوب) ===== */
         #dashboardScreen {
             display: none;
             padding: 30px 5%;
@@ -141,7 +141,7 @@
             padding-bottom: 20px;
             margin-bottom: 40px;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 20px;
         }
 
         header h1 {
@@ -165,6 +165,7 @@
             font-size: 0.9rem;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             transition: 0.3s;
             background: rgba(255, 255, 255, 0.05);
@@ -174,14 +175,14 @@
         .back-store-btn:hover, .settings-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
         .logout-btn:hover { border-color: var(--danger-color); color: var(--danger-color); }
 
+        /* الشاشات الكبيرة: يبقى النظام عمودين متجاورين لحفظ المظهر الأصلي الفخم */
         .main-container {
             display: grid;
             grid-template-columns: 1fr 1.2fr;
             gap: 40px;
             margin-bottom: 40px;
+            width: 100%;
         }
-
-        @media (max-width: 1024px) { .main-container { grid-template-columns: 1fr; } }
 
         .full-width-container { width: 100%; }
 
@@ -193,7 +194,7 @@
             backdrop-filter: blur(10px);
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
             height: fit-content;
-            margin-bottom: 30px;
+            width: 100%;
         }
 
         .card-title {
@@ -237,7 +238,6 @@
         .file-upload-wrapper input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
         .file-upload-wrapper i { font-size: 2rem; color: var(--secondary-color); margin-bottom: 10px; display: block; }
 
-        /* FIX: تحذير حجم الصور */
         .size-warning {
             background: rgba(241, 196, 15, 0.1);
             border: 1px solid rgba(241, 196, 15, 0.4);
@@ -363,6 +363,185 @@
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .toast.success { border-color: var(--success-color); }
         .toast.error { border-color: var(--danger-color); }
+
+        /* ============================================================
+           📱 التجاوب الذكي: يتم تفعيله حصرياً على الهواتف فقط 📱
+           ============================================================ */
+        @media (max-width: 1024px) {
+            .main-container {
+                display: flex;
+                flex-direction: column;
+                gap: 25px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #dashboardScreen {
+                padding: 15px 3%;
+            }
+
+            header {
+                flex-direction: column;
+                justify-content: center;
+                text-align: center;
+                gap: 15px;
+                margin-bottom: 25px;
+                padding-bottom: 15px;
+            }
+
+            header h1 {
+                font-size: 1.3rem;
+                flex-direction: column;
+                justify-content: center;
+                gap: 8px;
+                text-align: center;
+                width: 100%;
+                line-height: 1.4;
+            }
+
+            .header-btns {
+                flex-direction: column;
+                width: 100%;
+                gap: 10px;
+            }
+
+            .back-store-btn, .logout-btn, .settings-btn {
+                width: 100%;
+                padding: 12px;
+                font-size: 0.95rem;
+                border-radius: 10px;
+            }
+
+            .admin-card {
+                padding: 15px;
+                margin-bottom: 20px;
+                border-radius: 12px;
+                width: 100% !important;
+            }
+
+            .card-title {
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .file-upload-wrapper {
+                padding: 15px 10px;
+            }
+
+            /* === نظام كروت المنتجات المعروضة للهاتف مع المسميات الثابتة الحقيقية === */
+            #adminProductsTable, #adminProductsTable thead, #adminProductsTable tbody, #adminProductsTable tr, #adminProductsTable td {
+                display: block;
+                width: 100%;
+            }
+
+            #adminProductsTable thead {
+                display: none;
+            }
+
+            #adminProductsTable tbody tr {
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(0, 242, 254, 0.15);
+                border-radius: 12px;
+                padding: 12px;
+                margin-bottom: 15px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            }
+
+            #adminProductsTable td {
+                text-align: right;
+                padding: 10px 0;
+                border-bottom: 1px solid rgba(255,255,255,0.05);
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            #adminProductsTable td:last-child {
+                border-bottom: none;
+                padding-top: 12px;
+                display: block;
+            }
+
+            #adminProductsTable td:nth-of-type(1)::before { content: "الصورة:"; font-weight: 600; color: var(--primary-color); font-size: 0.85rem; }
+            #adminProductsTable td:nth-of-type(2)::before { content: "اسم المنتج:"; font-weight: 600; color: var(--primary-color); font-size: 0.85rem; }
+            #adminProductsTable td:nth-of-type(3)::before { content: "التصنيف:"; font-weight: 600; color: var(--primary-color); font-size: 0.85rem; }
+            #adminProductsTable td:nth-of-type(4)::before { content: "السعر:"; font-weight: 600; color: var(--primary-color); font-size: 0.85rem; }
+            #adminProductsTable td:nth-of-type(5)::before { content: "العمليات:"; font-weight: 600; color: var(--primary-color); font-size: 0.85rem; display: block; margin-bottom: 8px; }
+
+            #adminProductsTable td > img.table-thumb {
+                width: 50px;
+                height: 50px;
+                margin-left: 0;
+            }
+
+            /* === تصحيح نظام كروت سجل الطلبات للهاتف ليتطابق مع مسمياتك الفعلية 100% === */
+            #adminOrdersTable, #adminOrdersTable thead, #adminOrdersTable tbody, #adminOrdersTable tr, #adminOrdersTable td {
+                display: block;
+                width: 100%;
+            }
+
+            #adminOrdersTable thead {
+                display: none; /* إخفاء هيدر الجدول الأفقي على الهاتف */
+            }
+
+            #adminOrdersTable tbody tr {
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(0, 242, 254, 0.15);
+                border-radius: 12px;
+                padding: 15px;
+                margin-bottom: 20px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            }
+
+            #adminOrdersTable td {
+                text-align: right;
+                padding: 10px 0;
+                border-bottom: 1px solid rgba(255,255,255,0.05);
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            #adminOrdersTable td:last-child {
+                border-bottom: none;
+                padding-top: 15px;
+                display: block;
+            }
+
+            /* ربط مسميات الكروت الحقيقية والخاصة بجدولك الفعلي */
+            #adminOrdersTable td:nth-of-type(1)::before { content: "تاريخ الطلب:"; font-weight: 600; color: var(--primary-color); font-size: 0.85rem; }
+            #adminOrdersTable td:nth-of-type(2)::before { content: "المنتج المطلوب:"; font-weight: 600; color: var(--primary-color); font-size: 0.85rem; }
+            #adminOrdersTable td:nth-of-type(3)::before { content: "معلومات العميل:"; font-weight: 600; color: var(--primary-color); font-size: 0.85rem; }
+            #adminOrdersTable td:nth-of-type(4)::before { content: "الحالة:"; font-weight: 600; color: var(--primary-color); font-size: 0.85rem; }
+            #adminOrdersTable td:nth-of-type(5)::before { content: "تغيير الحالة / إجراءات:"; font-weight: 600; color: var(--primary-color); font-size: 0.85rem; display: block; margin-bottom: 8px; }
+
+            #adminOrdersTable td > div, #adminOrdersTable td > span {
+                text-align: left;
+                display: inline-block;
+            }
+
+            /* تنسيق الأزرار للموبايل لسهولة اللمس */
+            .actions-btns {
+                justify-content: flex-start;
+                gap: 8px;
+                width: 100%;
+            }
+            
+            .actions-btns .action-btn {
+                flex: 1;
+                font-size: 0.85rem;
+                padding: 10px;
+                height: 38px;
+                border-radius: 8px;
+            }
+        }
     </style>
 </head>
 <body>
